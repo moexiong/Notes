@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       					   http://www.springframework.org/schema/beans/spring-beans.xsd
+       					   http://www.springframework.org/schema/context 
+			   			   http://www.springframework.org/schema/context/spring-context.xsd
+			   			   http://www.springframework.org/schema/aop 
+	    				   http://www.springframework.org/schema/aop/spring-aop.xsd">
+	<!-- 开启spring需要4+1个jar包
+		spring-beans,spring-context,spring-core,spring-expression
+		com.springsource.org.apache.commons.logging
+	 -->
+	<!-- 用于配置spring提供的bean对象实例
+		id：在web层要调用业务时通过标志来向spring发出请求
+		class：业务所在的全限定类名
+		scope：作用域
+			prototype:多例模式，每次getBean都会返回一个新的对象
+			singleton:单例模式（默认），每次调用都是一个bean
+	 -->
+	<bean id="userServiceId" class="com.zsx.a_ioc.UserServiceImpl" scope="prototype"></bean>
+	
+	<bean id="bookService" class="com.zsx.b_di.BookServiceImpl">
+		<!--用于依赖注入，b类含有a类的引用时（依赖），通过setter方法将a类的实例放入b类（注入）
+			name：成员变量的名称，字段名
+			ref ：所引用的bean的id
+		 -->
+		<property name="bd" ref="bookDao"></property>
+	</bean>
+	<bean id="bookDao" class="com.zsx.b_di.BookDaoImpl"></bean>
+	
+	<!-- 
+		<bean id="" class=""></bean> bean的构造，默认有，然后被覆盖，没什么用
+	 -->
+	
+	<!-- 静态工厂
+		factory-method:静态方法名
+	 -->
+	<bean id="myStaticFactory" class="com.zsx.c_loadbean.b_staticfactory.MyStaticFactory" factory-method="getService"></bean>
+	
+	<!-- 非静态工厂 -->
+	<bean id="myFactory" class="com.zsx.c_loadbean.c_factory.MyFactory"></bean>
+	<!-- 
+		factory-bean  :引用的非静态工厂的id
+		factory-method:引用的非静态工厂的方法
+	 -->
+	<bean id="userService" factory-bean="myFactory" factory-method="getService"></bean>
+	
+	<!-- 生命周期
+		模拟spring：
+			A a = new A();			创建实例
+			postProcessBeforeInitialization		前方法
+			init(a);				初始化实例
+			postProcessAfterInitialization		后方法
+			a.??					调用实例
+			destory(a);				销毁实例
+	 -->
+	<bean id="lifeService" class="com.zsx.c_loadbean.e_lifecycle.LifeServiceImpl" init-method="initLife" destroy-method="destroyLife"></bean>
+	<!-- 配置自定义bean后处理器的实现类    （先注释掉，消息太多）
+		<bean class="com.zsx.c_loadbean.e_lifecycle.MyBeanPostProcessor"></bean>
+	 -->
+	 
+	 <!-- 
+	 	基于xml的构造方法参数注入
+	 	使用constructor-arg标签
+	 		name :bean的实体类中的字段名
+	 		index:参数的位置索引
+	 		ref	 :bean的实体类中的引用名，通常是另一个bean的id
+	 		type :参数的类型（全类名）
+	 		value:参数的值
+	  -->
+	 <bean id="user" class="com.zsx.d_attributein.a_construct.User">
+	 	<!-- 一般使用index，type，value三个属性来进行构造方法注入 -->
+	 	<constructor-arg index="0" type="java.lang.String" value="tom"></constructor-arg>
+	 	<constructor-arg index="1" type="java.lang.Integer" value="20"></constructor-arg>
+	 </bean>
+	 
+	 <!-- setter方法注入 -->
+	 <bean id="person" class="com.zsx.d_attributein.b_setter.Person">
+	 	<!-- property的2中写法 -->
+	 	<property name="pname" value="jerry"></property>
+	 	<property name="page">
+	 		<value>22</value>
+	 	</property>
+	 	<property name="address" ref="address"></property>
+	 </bean>
+	 <bean id="address" class="com.zsx.d_attributein.b_setter.Address">
+	 	<property name="aname" value="hubei"></property>
+	 	<property name="atel">
+	 		<value>120</value>
+	 	</property>
+	 </bean>
+	 
+	 <!-- 
+	 	p命名空间注入(不常用)
+	 		1.复制第二行的 xmlns="http://www.springframework.org/schema/beans"
+	 		2.将其改为        xmlns:p="http://www.springframework.org/schema/p" 并放在其他行
+	 		3.在bean标签里写上  p:pname="" p:page="" p:address-ref="" 将参数注入进去
+	  -->
+	  
+	  <!-- 
+	  	集合注入
+	   -->
+	   <bean id="collData" class="com.zsx.d_attributein.d_collection.CollData">
+	   		<property name="array">
+	   			<array>
+	   				<!-- 
+	   					value:普通值
+	   					ref:引用值
+	   				 -->
+	   				<value>array1</value>
+	   				<value>array2</value>
+	   			</array>
+	   		</property>
+	   		<property name="listData">
+	   			<list>
+	   				<value>list1</value>
+	   				<value>list2</value>
+	   			</list>
+	   		</property>
+	   		<property name="setData">
+	   			<set>
+	   				<value>set1</value>
+	   				<value>set2</value>
+	   			</set>
+	   		</property>
+	   		<property name="mapData">
+	   			<map>
+	   				<entry key="m1" value="map1"></entry>
+	   				<entry key="m2" value="map2"></entry>
+	   			</map>
+	   		</property>
+	   		<property name="propsData">
+	   			<props>
+	   				<prop key="p1">prop1</prop>
+	   				<prop key="p2">prop2</prop>
+	   			</props>
+	   		</property>
+	   </bean>
+
+	   <!-- 
+	   		基于注解的参数注入
+		   		1.导入命名空间  在xsd-config.html中The context schema下
+			   		xmlns:context="http://www.springframework.org/schema/context"
+			   		http://www.springframework.org/schema/context 
+			   		http://www.springframework.org/schema/context/spring-context.xsd
+			   	2.填写扫描的包
+			   		context:component-scan base-package="需要扫描注解的包"
+			   		
+			   	注解的写法
+			   	1.通用写法：@Component 相当于  bean class="" 标签
+			   			 @Component("填写id") 相当于  bean id="" class="" 标签
+			   	2.web写法：web层：@Controller
+			   			 service层：@Service
+			   			 dao层：@Repository
+			   	3.依赖注入：
+			   			普通值：
+			   			   @Value("") 手动注入参数 需要setter方法
+			   			引用值：
+			   			 1.@Autowired 自动注入参数（根据类型）
+			   			 2.@Autowired
+			   			   @Qualifier("填写id") 手动注入参数 需要setter方法
+			   			 3.@Resource("填写id")  手动注入参数 需要setter方法
+	    -->
+	    <context:component-scan base-package="com.zsx.d_attributein.e_annotation"></context:component-scan>
+	    
+	    <!-- bean的半自动代理 -->
+	    <!-- 目标类 -->
+	    <bean id="deskService" class="com.zsx.e_aop.a_jdkproxy.DeskServiceImpl"></bean>
+	    <!-- 切面类 -->
+	    <bean id="myAspect" class="com.zsx.e_aop.c_beanproxy.MyAspect"></bean>
+	    <!-- 代理类
+	    	使用FactoryBean生成代理对象（ProxyFactoryBean实现类）
+	    		interfaces ：代理对象需要实现的接口，如果有多个就加子标签array之类的 一个就使用value="全类名"属性填写
+	    		target ：目标类的id，填写的是引用用ref标签
+	    		interceptorNames ：切面类的id，填写的是引用名的字符串数组，使用value="填写id"
+	    		optimize ：是否强制使用cglib代理（一般不管）
+	     -->
+	    <bean id="proxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+	    	<property name="interfaces" value="com.zsx.e_aop.a_jdkproxy.DeskService"></property>
+	    	<property name="target" ref="deskService"></property>
+	    	<property name="interceptorNames" value="myAspect"></property>
+	    </bean>
+	    
+	    <!-- AOP全自动代理 -->
+	    <!-- 目标类（上面已配） -->
+	    <!-- 切面类（上面已配） -->
+	    <!-- 
+	    	AOP配置
+	    	导入jar包3个
+	    		spring-aop
+	    		com.springsource.org.aopalliance
+	    		com.springsource.org.aspectj.weaver
+	    	导入命名空间  在xsd-config.html中The aop schema下黑色部分
+	    		xmlns:aop="http://www.springframework.org/schema/aop"
+	    		http://www.springframework.org/schema/aop 
+	    		http://www.springframework.org/schema/aop/spring-aop.xsd
+	    	proxy-target-class:设置是否强制使用cglib代理，true为使用，默认false
+	    	pointcut:切入点
+	    		expression:表达式 exection(* com.zsx.e_aop.a_jdkproxy.DeskService.(addDesk|updateDesk)(..))
+	    			*=任意 返回值类型	*=任意 方法	(..)=任意 方法的参数
+	    		id:当前切入点的id
+	    	advisor:一个切入点和一个通知组成的特殊切面
+	    		advice-ref:切面类的引用id
+	    		pointcut-ref:切入点的引用id
+	     -->
+	    <aop:config>
+	    	<aop:pointcut expression="execution(* com.zsx.e_aop.a_jdkproxy.DeskService.*(..))" id="deskProxy"/>
+	    	<aop:advisor advice-ref="myAspect" pointcut-ref="deskProxy"/>
+	    </aop:config>
+	    
+	    <!-- 
+	    	aspectJ配置
+	    	 导入jar包4个
+	    	 	spring-aop(aop已有)
+	    		com.springsource.org.aopalliance(aop已有)
+	    		com.springsource.org.aspectj.weaver(aop已有)
+	    		spring-aspects
+	    -->
+	    <!-- aspectJ切面基于xml -->
+	    <!-- 配置目标类 -->
+	    <bean id="penService" class="com.zsx.e_aop.e_aspectjxml.PenServiceImpl"></bean>
+	    <!-- 配置切面类 -->
+	    <bean id="myAspectForXML" class="com.zsx.e_aop.e_aspectjxml.MyAspectForXML"></bean>
+	    <aop:config>
+	    	<!-- 声明切面类 -->
+	    	<aop:aspect ref="myAspectForXML">
+	    		<!-- 此处的pointcut标签声明的是全局切入点表达式，所有的通知都可以使用id来引用他 -->
+	    		<aop:pointcut expression="execution(* com.zsx.e_aop.e_aspectjxml.PenServiceImpl.*(..))" id="penProxy"/>
+	    		<!-- before
+	    			method：声明作为前置通知的方法
+	    			pointcut：切入点表达式
+	    			pointcut-ref：切入点表达式的引用
+	    		例如：
+	    		<aop:before method="myBefore" pointcut-ref="penProxy"/>
+	    		-->
+	    		 
+	    		<!-- after-returning
+	    		 	returning：接收目标方法的返回值，由此处的配置决定名称，类型为Object
+	    		 例如：
+	    		<aop:after-returning method="myAfterReturning" pointcut-ref="penProxy" returning="ret"/>
+	    		-->
+	    		
+	    		<!-- around
+	    		例如：
+	    		<aop:around method="myAround" pointcut-ref="penProxy"/>
+	    		 -->
+	    		 
+	    		<!-- after-throwing
+	    			throwing：抛出的异常，由此处的配置决定名称，类型为Exception
+	    		例如：
+	    		<aop:after-throwing method="myAfterThrowing" pointcut-ref="penProxy" throwing="e"/>
+	    		 -->
+	    		 
+	    		<!-- after
+	    		例如：
+	    		<aop:after method="myAfter" pointcut-ref="penProxy"/>
+	    		 -->
+	    	</aop:aspect>
+	    </aop:config>
+	    <!-- aspectJ切面基于注解  -->
+	    <!-- 
+	    	1.添加需要扫描注解的包
+	    	2.添加aspectj-autoproxy自动代理
+	     -->
+	    <context:component-scan base-package="com.zsx.e_aop.f_aspectjanno"></context:component-scan>
+	    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+	    
+	    <!-- 
+	    	jdbcTemplate配置
+	    	导入jar包
+	    		spring-jdbc-3.2.0.RELEASE jdbc核心包
+	    		spring-tx-3.2.0.RELEASE 事务处理
+	    		com.springsource.com.mchange.v2.c3p0 C3P0连接池
+	    		com.springsource.org.apache.commons.dbcp DBCP连接池
+	    		com.springsource.org.apache.commons.pool DBCP连接池依赖包
+	    		mysql-connector-java-5.1.28-bin mysql数据库核心驱动包
+	     -->
+	    <!-- dbcp
+	    	1.配置数据源
+	    	2.配置jdbcTemplate
+	    	3.配置目标类
+	    <bean id="basicDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+	    	<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+	    	<property name="url" value="jdbc:mysql://localhost:3306/spring001"></property>
+	    	<property name="username" value="root"></property>
+	    	<property name="password" value="root"></property>
+	    </bean>
+	    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+	    	<property name="dataSource" ref="basicDataSource"></property>
+	    </bean>
+	    <bean id="paperDao" class="com.zsx.f_jdbctemplate.c_dbcp.PaperDaoImpl">
+	    	<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	    </bean>
+	    -->
+	    <!-- c3p0(基本同上所以此处加上  jdbcDaoSupport=不需要配置jdbcTemplate)
+	    	1.配置数据源
+	    	2.配置目标类
+	    <bean id="comboPooledDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+	    	<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+	    	<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/spring001"></property>
+	    	<property name="user" value="root"></property>
+	    	<property name="password" value="root"></property>
+	    </bean>
+	    -->
+	    <bean id="paperDao" class="com.zsx.f_jdbctemplate.d_c3p0jdbcsup.PaperDaoImpl">
+	    	<property name="dataSource" ref="comboPooledDataSource"></property>
+	    </bean>
+	    <!-- 利用jdbcInfo.properties文件进行配置
+	    		location：文件路径 classpath:......
+	    	配置数据源时利用${key}来从指定文件中取值
+	     -->
+	    <context:property-placeholder location="classpath:com/zsx/f_jdbctemplate/e_properties/jdbcInfo.properties"/>
+	    <bean id="comboPooledDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+	    	<property name="driverClass" value="${jdbc.driverClass}"></property>
+	    	<property name="jdbcUrl" value="${jdbc.url}"></property>
+	    	<property name="user" value="${jdbc.username}"></property>
+	    	<property name="password" value="${jdbc.password}"></property>
+	    </bean>
+</beans>
