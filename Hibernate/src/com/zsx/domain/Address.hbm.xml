@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.zsx.domain">
+	<!-- class的lazy属性决定的是类级别加载策略 ==有load和get方法，这个属性没多大用
+		lazy属性，决定了load方法的类级别加载策略
+			默认值：true：延迟加载，使用时加载 = load()
+			false：直接加载			  = load() == get()
+	 -->
+	<class name="Address" table="t_address">
+		<id name="id" column="id">
+		<!-- 既是主键又是外键 -->
+			<generator class="foreign">
+				<param name="property">company</param>
+			</generator>
+		</id>
+		<!-- type：配置类型 -->
+		<property name="name" column="name" type="string"></property>
+		
+		<one-to-one name="company" class="Company" constrained="true"></one-to-one>
+	</class>
+</hibernate-mapping>

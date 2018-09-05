@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.zsx.domain">
+	<class name="Course" table="t_course">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<!-- type：配置类型 -->
+		<property name="name" column="name" type="string"></property>
+		<!--set：是与实体中的Set集合相对应
+				name：实体中的字段
+				table：多对多关系中双方确定的唯一中间表
+				inverse：反转     默认是false 值为true时表示放弃自己对外键关系的维护，由另一方来进行维护
+				cascade：级联操作
+					save-update：级联保存和级联修改
+					delete：级联删除
+					delete-orphan：孤儿删除
+					all：save-update 和 delete
+					all-delete-orphan：save-update 和 delete 和 delete-orphan
+			key：维护的外键
+				column：一对多关系中维护的外键，一定要与相关联的实体中绑定的外键名一致
+			many-to-many：配置相关联的实体类名
+				class：实体的完整类名
+				column：相关联实体的引用外键
+		 -->
+		<set name="students" table="t_student_course" inverse="true">
+			<key column="cid"></key>
+			<many-to-many class="Student" column="sid"></many-to-many>
+		</set>
+	</class>
+</hibernate-mapping>

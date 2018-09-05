@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- package:写上配置文件所在的包 -->
+<hibernate-mapping package="com.zsx.domain">
+	<!-- name:实体的完整类名  table:对应的表名 -->
+	<class name="User" table="t_user">
+		<id name="id" column="id">
+		<!-- generator设置主键策略
+			increment: 设置主键自增，先从数据库取出最大主键+1（不适合使用）
+			identity:  依赖数据库的主键自增（Mysql，Sql Server）
+			sequence:  依赖数据库的序列（Oracle）
+			hilo:	   Hibernate自己实现的主键序列算法
+			native:    按照优先级三选一  identity》sequence》hilo
+			uuid:	       生成32位的主键
+			assigned:  设置主键为自然主键
+		-->
+			<generator class="native"></generator>
+		</id>
+		<!-- name:bean中的字段   column:对应的表中的字段 -->
+		<property name="name" column="name"></property>
+		<property name="password" column="password"></property>
+	</class>
+</hibernate-mapping>

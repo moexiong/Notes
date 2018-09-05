@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.zsx.domain">
+	<!-- class的lazy属性决定的是类级别加载策略 ==有load和get方法，这个属性没多大用
+		lazy属性，决定了load方法的类级别加载策略
+			默认值：true：延迟加载，使用时加载 = load()
+			false：直接加载			  = load() == get()
+	 -->
+	<class name="Customer" table="t_customer">
+		<id name="id" column="id">
+			<generator class="native"></generator>
+		</id>
+		<!-- type：配置类型 -->
+		<property name="name" column="name" type="string"></property>
+		<!--set：是与实体中的Set集合相对应
+				name：实体中的字段
+				inverse：反转     默认是false 值为true时表示放弃自己对外键关系的维护，由另一方来进行维护
+				cascade：级联操作
+					save-update：级联保存和级联修改
+					delete：级联删除
+					delete-orphan：孤儿删除
+					all：save-update 和 delete
+					all-delete-orphan：save-update 和 delete 和 delete-orphan
+			key：维护的外键
+				column：一对多关系中维护的外键，一定要与相关联的实体中绑定的外键名一致
+			one-to-many：配置相关联的实体类名
+				class：实体的完整类名
+		 -->
+		 <!-- set的lazy属性决定的是级联级别加载策略
+			lazy属性，决定了级联级别加载策略
+				默认值：true：延迟加载，使用时加载
+				false：直接加载
+				extra：极其懒惰，只调用集合size时也不加载数据
+			fetch属性，决定了使用什么sql语句加载
+				select：直接使用普通sql语句加载
+				join：使用连接查询		使用join时会使lazy属性失效，会立即加载所有数据
+				subselect：使用嵌套查询
+			batch-size属性，决定了一次加载的对象集合数量
+	 	-->
+		<set name="orders">
+			<key column="cid"></key>
+			<one-to-many class="Order"/>
+		</set>
+		<!--
+	 		命名查询：书写一个局部的HQL语句，在DAO中可以直接通过局部配置的类全名加名字来引用HQL语句
+	 		eg:session.getNameQuery("com.zsx.domain.Customer.bbb");
+			局部配置
+		 -->
+	 <query name="bbb"><![CDATA[from Order]]></query>
+	</class>
+	<!--
+	 	命名查询：书写一个全局的HQL语句，在DAO中可以直接通过名字来引用HQL语句
+	 	eg:session.getNameQuery("aaa");
+		全局配置
+	 -->
+	 <query name="aaa"><![CDATA[from Customer]]></query>
+</hibernate-mapping>
