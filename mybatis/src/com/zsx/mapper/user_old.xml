@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 只有mapper根标签，namespace表示当前配置的sql语句是针对于哪一个命名空间下，通过 》 命名空间.sql语句id《 的方式来引用  -->
+<mapper namespace="user">
+	<!-- 常用标签6个，cache,cache-ref,paramaterMap不用
+		insert:添加操作
+			   id:当前查询的名称 
+			   parameterType:要注入的参数的类型，包装类
+			   resultType:自动封装返回的结果需要封装成的对象的完整类名（自动封装的前提：数据库表的字段与实体的字段相同）
+		delete:删除操作
+		update:更新操作
+		select:查询操作
+		sql:sql片段
+		resultMap:结果映射，当自动映射不好用时采用手动映射
+	 -->
+	 <!-- sql语句里的占位符表示：#{} 占位符里面的东西随便写
+	 	#{value} 相当于 'value'	value可以写任意字符串，当入参为某个对象类型时，value为它对应的字段
+	 	${value} 相当于   value	value只能是value，不能更改
+	  -->
+	<select id="findUserById" parameterType="Integer" resultType="com.zsx.pojo.User">
+		select *
+		from user
+		where id = #{v}
+	</select>
+	<!-- 
+		模糊查询like '%${value}%'	(不用)		不防sql注入
+					"%"#{username}"%"	防sql注入
+	 -->
+	<select id="findUsersByName" parameterType="com.zsx.pojo.User" resultType="com.zsx.pojo.User">
+		select *
+		from user
+		where username like "%"#{username}"%"
+	</select>
+	<!-- 
+		selectKey:插入时，如果要得到返回的id，需要使用selectKey标签
+			keyProperty:要返回的主键需要存放的位置
+			resultType :返回的主键类型
+			order	   :是在数据写入之前获取id或是写入之后获取id
+			select LAST_INSERT_ID():是MySql数据库里自带的方法，获取最近插入的数据的id
+	 -->
+	<insert id="saveUser" parameterType="com.zsx.pojo.User">
+		<selectKey keyProperty="id" resultType="Integer" order="AFTER">
+			select LAST_INSERT_ID()
+		</selectKey>
+		insert into user(username, sex, birthday, address)
+		values(#{username}, #{sex}, #{birthday}, #{address})
+	</insert>
+	
+	<update id="updateUserById" parameterType="com.zsx.pojo.User">
+		update user
+		set username = #{username}, sex = #{sex}, birthday = #{birthday}, address = #{address}
+		where id = #{id}
+	</update>
+	
+	<delete id="deleteUserById" parameterType="com.zsx.pojo.User">
+		delete from user
+		where id = #{id}
+	</delete>
+</mapper>

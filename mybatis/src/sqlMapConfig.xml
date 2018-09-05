@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- properties用来配置资源文件，例如加载数据库的 -->
+	<!-- <properties resource=""><property name="" value=""/></properties> -->
+	
+	<!-- 
+		typeAliases:类型别名
+			typeAlias:指定一个类的类型别名
+				type:指定的类的全类名
+				alias:别名
+			package（推荐）:所有需要生成别名的类所在的包及其子包，别名自动为类名（首字母大小写均可）
+	 -->
+	<typeAliases>
+		<!-- <typeAlias type="com.zsx.pojo.User" alias="User"/> -->
+		<package name="com.zsx.pojo"/>
+	</typeAliases>
+	
+	<environments default="development">
+		<environment id="development">
+			<!-- 使用jdbc事务管理 -->
+			<transactionManager type="JDBC" />
+			<!-- 数据库连接池 -->
+			<dataSource type="POOLED">
+				<property name="driver" value="com.mysql.jdbc.Driver" />
+				<property name="url" value="jdbc:mysql://localhost:3306/mybatisdb?characterEncoding=utf-8" />
+				<property name="username" value="root" />
+				<property name="password" value="root" />
+			</dataSource>
+		</environment>
+	</environments>
+	<mappers>
+		<!-- 配置方法1：按路径一个一个配置
+		<mapper resource="com/zsx/mapper/user_old.xml"/>
+		<mapper resource="com/zsx/mapper/user.xml"/>
+		 -->
+		 <!-- 配置方法2（推荐）：所有需要配置的文件所在的包及其子包，前提：必须必须对象的映射接口类名与配置文件名一致 -->
+		 <package name="com.zsx.dao_mapper"/>
+	</mappers>
+</configuration>

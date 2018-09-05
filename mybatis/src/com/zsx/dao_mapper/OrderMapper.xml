@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zsx.dao_mapper.OrderMapper">
+	<!-- 半自动映射，resultMap的id可以随便取名 -->
+	<select id="findOrders" resultMap="orders">
+		select * from orders
+	</select>
+	<resultMap type="Orders" id="orders">
+		<!-- 只需要填写不对应的即可(id为id标签，其他为result标签) -->
+		<result column="user_id" property="userId"/>
+	</resultMap>
+	
+	<!-- 一对一关系联合查询，根据订单id查询订单及用户名称 -->
+	<select id="findOrderUsernameByOrderId" parameterType="Integer" resultMap="orders_1">
+		select o.*, u.username
+		from orders o
+		left join user u
+		on o.user_id = u.id
+		where o.id = #{id}
+	</select>
+	<!-- 一对一关系时，属性与字段的映射必须写全，不能省略！！！！！！ -->
+	<resultMap type="Orders" id="orders_1">
+		<id column="id" property="id"/>
+		<result column="user_id" property="userId"/>
+		<result column="number" property="number"/>
+		<result column="createtime" property="createtime"/>
+		<result column="note" property="note"/>
+		<!-- 一对一关系采用association标签来关联字段 -->
+		<association property="user" javaType="User">
+			<result column="username" property="username"/>
+		</association>
+	</resultMap>
+</mapper>
