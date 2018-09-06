@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+						   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       					   http://www.springframework.org/schema/context
+       					   http://www.springframework.org/schema/context/spring-context-4.0.xsd
+       					   http://www.springframework.org/schema/tx
+       					   http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+       					   http://www.springframework.org/schema/aop
+       					   http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+       					   http://www.springframework.org/schema/util
+       					   http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+	
+	<!-- 1.添加spring注解扫描基本包（扫描spring的相关注解） -->
+	<context:component-scan base-package="com.zsx"></context:component-scan>
+	
+	<!-- 2.加载jdbc信息文件 -->
+	<context:property-placeholder location="classpath:jdbcInfo.properties"/>
+	
+	<!-- 3.配置数据源 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driver}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+	</bean>
+	
+	<!-- 4.生成mybatis工厂bean -->
+	<bean class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 注入mybatis配置文件位置 -->
+		<property name="configLocation" value="classpath:sqlMapConfig.xml"></property>
+	</bean>
+	
+	<!-- 5.添加mybatis动态代理开发（扫描基本包，用于实例化Mapper接口及文件） -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 此处配置了扫描后，sqlMapConfig.xml中不需要配置Mapper的所在基本包 -->
+		<property name="basePackage" value="com.zsx.dao"></property>
+	</bean>
+	
+	<!-- 6.配置springMVC三大组件（在springMVC.xml中） -->
+	
+	<!-- 7.配置事务 -->
+	<!-- 7.1配置事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<!-- 7.2配置通知（自动方式） -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>

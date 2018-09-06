@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zsx.dao.ItemMapper">
+	<sql id="selectAll">
+		select * from items
+	</sql>
+	<!-- 查找所有项 -->
+	<select id="selectAllItems" resultType="Item">
+		<include refid="selectAll"></include>
+	</select>
+	
+	<!-- 通过id查找一项 -->
+	<select id="selectOneItem" parameterType="Item" resultType="Item">
+		<include refid="selectAll"></include>
+		where id = #{id}
+	</select>
+	
+	<!-- 通过QueryVo来更新item项 -->
+	<update id="updateOneItem" parameterType="QueryVo">
+		<selectKey keyProperty="affectRow" resultType="Integer" order="AFTER">
+			SELECT @MYSQL_AFFECTED_ROWS
+		</selectKey>
+		update items
+		<set>
+			<if test="item.name != null and item.name != ''">
+				name = #{item.name},
+			</if>
+			<if test="item.price != null and item.price != ''">
+				price = #{item.price},
+			</if>
+			<if test="item.detail != null and item.detail != ''">
+				detail = #{item.detail},
+			</if>
+			<if test="item.pic != null and item.pic != ''">
+				pic = #{item.pic},
+			</if>
+			<if test="item.createtime != null and item.createtime != ''">
+				createtime = #{item.createtime},
+			</if>
+		</set>
+		where id = #{item.id}
+	</update>
+</mapper>
